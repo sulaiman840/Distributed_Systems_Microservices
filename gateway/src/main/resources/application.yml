@@ -1,0 +1,48 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: gateway-service
+
+  cloud:
+    discovery:
+      client:
+        service-url:
+          defaultZone: http://localhost:8761/eureka
+    loadbalancer:
+      retry:
+        enabled: true
+        max-attempts: 3
+    gateway:
+      discovery:
+        locator:
+          enabled: false # disable the auto-routes if you prefer
+      routes:
+        - id: auth
+          uri: lb://auth-service
+          predicates:
+            - Path=/auth/** # catch /auth/login, /auth/register, etc.
+        - id: users
+          uri: lb://auth-service
+          predicates:
+            - Path=/users/**
+
+        - id: courses # new Courses route
+          uri: lb://courses-service
+          predicates:
+            - Path=/courses/**
+        - id: subscriptions # new Courses route
+          uri: lb://courses-service
+          predicates:
+            - Path=/subscriptions/**
+
+        - id: exams # new Courses route
+          uri: lb://exam-service
+          predicates:
+            - Path=/exams/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka

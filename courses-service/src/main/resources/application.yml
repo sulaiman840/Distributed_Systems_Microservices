@@ -1,0 +1,51 @@
+server:
+  # default to 8100, but can be overridden at startup:
+  #   mvn spring-boot:run -Dserver.port=8110
+  port: 0
+
+spring:
+  application:
+    name: courses-service
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/coursedb?useSSL=false&serverTimezone=UTC
+    username: root
+    password: ''
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+jwt:
+  secret: mySuperSecretKeyWhichIsVeryLongAndSecure12345
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+  instance:
+    instance-id: ${spring.application.name}:${random.value}
+    prefer-ip-address: true
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      authService:
+        register-health-indicator: true
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+  retry:
+    instances:
+      authService:
+        max-attempts: 3
+        wait-duration: 500ms
+  timelimiter:
+    instances:
+      authService:
+        timeout-duration: 2s
