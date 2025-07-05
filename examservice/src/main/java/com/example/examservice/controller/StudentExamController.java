@@ -46,7 +46,7 @@ public class StudentExamController {
         .body("Only students can start an exam");
     }
 
-    // override any passed studentId with the one in JWT:
+
     Long studentId = jwt.getClaim("userId");
     StudentExam se = studentExamService.startExam(examId, studentId);
     return ResponseEntity.ok(toDto(se));
@@ -67,7 +67,7 @@ public class StudentExamController {
         .body("Only students can submit answers");
     }
 
-    // build domain answers
+    
     List<StudentAnswer> domain =
       answers.stream()
         .map(r -> {

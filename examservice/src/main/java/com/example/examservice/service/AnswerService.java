@@ -28,7 +28,7 @@ public class AnswerService {
   }
 
   public Answer create(Long questionId, Integer optionIndex, String body) {
-    // delegate to QuestionService.createAnswer
+
     return questionService.createAnswer(questionId, optionIndex, body);
   }
 

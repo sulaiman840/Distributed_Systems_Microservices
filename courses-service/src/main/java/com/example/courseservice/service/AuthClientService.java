@@ -20,9 +20,7 @@ public class AuthClientService {
     this.authServiceName = authServiceName;
   }
 
-  /**
-   * يجلب بيانات المستخدم من auth-service ويحط الـ JWT في الهيدر
-   */
+
   public UserResponse getUserById(Long userId, String token) {
     HttpHeaders headers = new HttpHeaders();
     headers.setBearerAuth(token);

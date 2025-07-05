@@ -1,9 +1,9 @@
-// QuestionRequest.java
+
 package com.example.examservice.dto;
 
 public class QuestionRequest {
     private String text;
-    private Integer correctAnswer;   // 1..4
+    private Integer correctAnswer;  
 
     public QuestionRequest() {}
 

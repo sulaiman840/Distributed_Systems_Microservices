@@ -25,7 +25,7 @@ public class ExamController {
 
   @GetMapping
   public ResponseEntity<List<ExamResponse>> getAll(Authentication auth) {
-    // any authenticated user may list exams
+   
     List<ExamResponse> dto = examService.findAll().stream()
       .map(this::toDto)
       .collect(Collectors.toList());
@@ -37,7 +37,7 @@ public class ExamController {
       @PathVariable Long id,
       Authentication auth
   ) {
-    // any authenticated user may fetch a single exam
+  
     return examService.findById(id)
       .map(this::toDto)
       .map(ResponseEntity::ok)

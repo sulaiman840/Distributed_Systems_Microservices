@@ -24,9 +24,9 @@ eureka:
       defaultZone: http://localhost:8761/eureka
 
   instance:
-    # Each node gets a unique ID in Eureka
+  
     instance-id: ${spring.application.name}:${random.value}
-    # Optional: register the IP address rather than hostname
+ 
     prefer-ip-address: true
 
 jwt:

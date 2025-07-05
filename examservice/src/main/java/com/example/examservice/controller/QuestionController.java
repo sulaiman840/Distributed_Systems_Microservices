@@ -31,7 +31,7 @@ public class QuestionController {
       @PathVariable Long examId,
       Authentication auth
   ) {
-    // any authenticated user may list questions
+   
     List<QuestionResponse> dto = questionService
       .findByExam(examId)
       .stream()
@@ -64,7 +64,7 @@ public class QuestionController {
       @PathVariable Long questionId,
       Authentication auth
   ) {
-    // any authenticated user may list answers
+
     List<AnswerResponse> dto = questionService
       .findAnswers(questionId)
       .stream()

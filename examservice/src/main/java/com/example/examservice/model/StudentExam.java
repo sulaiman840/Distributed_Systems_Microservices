@@ -1,4 +1,4 @@
-// StudentExam.java
+
 package com.example.examservice.model;
 
 import jakarta.persistence.*;

@@ -23,7 +23,7 @@ public class Course {
   @Column(nullable = false)
   private boolean approved = false;
 
-  // Getters & setters
+
   public Course() {}
 
   public Long getId() { return id; }

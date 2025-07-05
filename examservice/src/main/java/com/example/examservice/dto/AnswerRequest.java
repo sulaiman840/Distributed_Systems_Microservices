@@ -1,8 +1,8 @@
-// AnswerRequest.java
+
 package com.example.examservice.dto;
 
 public class AnswerRequest {
-    private Integer optionIndex;  // 1..4
+    private Integer optionIndex;  
     private String body;
 
     public AnswerRequest() {}

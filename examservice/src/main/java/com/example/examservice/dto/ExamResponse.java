@@ -1,4 +1,4 @@
-// ExamResponse.java
+
 package com.example.examservice.dto;
 
 import java.time.LocalDateTime;

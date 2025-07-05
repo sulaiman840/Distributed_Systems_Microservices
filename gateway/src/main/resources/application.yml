@@ -17,27 +17,27 @@ spring:
     gateway:
       discovery:
         locator:
-          enabled: false # disable the auto-routes if you prefer
+          enabled: false 
       routes:
         - id: auth
           uri: lb://auth-service
           predicates:
-            - Path=/auth/** # catch /auth/login, /auth/register, etc.
+            - Path=/auth/**
         - id: users
           uri: lb://auth-service
           predicates:
             - Path=/users/**
 
-        - id: courses # new Courses route
+        - id: courses
           uri: lb://courses-service
           predicates:
             - Path=/courses/**
-        - id: subscriptions # new Courses route
+        - id: subscriptions 
           uri: lb://courses-service
           predicates:
             - Path=/subscriptions/**
 
-        - id: exams # new Courses route
+        - id: exams 
           uri: lb://exam-service
           predicates:
             - Path=/exams/**

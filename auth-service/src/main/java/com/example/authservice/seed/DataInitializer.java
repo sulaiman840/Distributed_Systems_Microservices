@@ -23,7 +23,7 @@ public class DataInitializer implements CommandLineRunner {
 
   @Override
   public void run(String... args) {
-    // Create roles if absent
+
     for (String r : List.of("ROLE_ADMIN", "ROLE_TEACHER", "ROLE_STUDENT")) {
       roleRepo.findByName(r).orElseGet(() -> {
         Role role = new Role();
@@ -32,7 +32,7 @@ public class DataInitializer implements CommandLineRunner {
       });
     }
 
-    // Seed default admin
+
     if (userRepo.findByUsername("admin").isEmpty()) {
       Role adminRole = roleRepo.findByName("ROLE_ADMIN").get();
       User admin = new User();

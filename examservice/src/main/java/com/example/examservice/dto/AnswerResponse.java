@@ -1,4 +1,4 @@
-// AnswerResponse.java
+
 package com.example.examservice.dto;
 
 public class AnswerResponse {

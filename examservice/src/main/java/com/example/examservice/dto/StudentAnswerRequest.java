@@ -1,9 +1,9 @@
-// StudentAnswerRequest.java
+
 package com.example.examservice.dto;
 
 public class StudentAnswerRequest {
     private Long questionId;
-    private Integer selectedOption;  // 1..4
+    private Integer selectedOption;  
 
     public StudentAnswerRequest() {}
 

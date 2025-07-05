@@ -1,10 +1,10 @@
-// QuestionResponse.java
+
 package com.example.examservice.dto;
 
 public class QuestionResponse {
     private Long id;
     private String text;
-    private Integer correctAnswer;   // 1..4
+    private Integer correctAnswer;   
 
     public QuestionResponse() {}
 

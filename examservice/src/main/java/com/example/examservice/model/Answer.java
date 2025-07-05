@@ -1,4 +1,4 @@
-// Answer.java
+
 package com.example.examservice.model;
 
 import jakarta.persistence.*;
@@ -20,7 +20,7 @@ public class Answer {
   private Question question;
 
   @Column(nullable = false)
-  private Integer optionIndex; // 1..4
+  private Integer optionIndex; 
 
   @Column(nullable = false, length = 1000)
   private String body;
