@@ -25,6 +25,9 @@ public class SecurityConfig {
     http
       .csrf(csrf -> csrf.disable())
       .authorizeHttpRequests(auth -> auth
+              // 1) allow payment callbacks from Payment Service
+        .requestMatchers(HttpMethod.POST, "/subscriptions/paid/**").permitAll()
+        .requestMatchers("/subscriptions/**").authenticated()
         .requestMatchers(HttpMethod.POST,   "/courses").authenticated()
         .requestMatchers(HttpMethod.PUT,    "/courses/**").authenticated()
         .requestMatchers(HttpMethod.DELETE, "/courses/**").authenticated()

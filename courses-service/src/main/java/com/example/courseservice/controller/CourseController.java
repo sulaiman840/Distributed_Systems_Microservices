@@ -26,10 +26,10 @@ public class CourseController {
   @PostMapping
   public ResponseEntity<?> create(
       @RequestBody CourseRequest req,
-      Authentication auth      // injected by Spring
+      Authentication auth     
   ) {
-    Jwt jwt = (Jwt) auth.getPrincipal();                // the raw JWT
-    String role = jwt.getClaimAsString("role");         // e.g. "ROLE_TEACHER"
+    Jwt jwt = (Jwt) auth.getPrincipal();              
+    String role = jwt.getClaimAsString("role");       
   
     if (!"ROLE_TEACHER".equals(role)) {
       return ResponseEntity
@@ -42,6 +42,7 @@ public class CourseController {
     c.setTeacherId(teacherId);
     c.setTitle(req.title());
     c.setDescription(req.description());
+    c.setPrice(req.price());
     Course saved = service.create(c);
     return ResponseEntity.ok(toDto(saved));
   }
@@ -52,8 +53,8 @@ public class CourseController {
       @RequestBody CourseRequest req,
       Authentication auth
   ) {
-    Jwt jwt = (Jwt) auth.getPrincipal();                // the raw JWT
-    String role = jwt.getClaimAsString("role");         // e.g. "ROLE_TEACHER"
+    Jwt jwt = (Jwt) auth.getPrincipal();              
+    String role = jwt.getClaimAsString("role");        
   
     if (!"ROLE_TEACHER".equals(role)) {
       return ResponseEntity
@@ -66,6 +67,7 @@ public class CourseController {
     }
     existing.setTitle(req.title());
     existing.setDescription(req.description());
+      existing.setPrice(req.price()); 
     return ResponseEntity.ok(toDto(service.update(id, existing)));
   }
 
@@ -74,8 +76,8 @@ public class CourseController {
       @PathVariable Long id,
       Authentication auth
   ) {
-    Jwt jwt = (Jwt) auth.getPrincipal();                // the raw JWT
-    String role = jwt.getClaimAsString("role");         // e.g. "ROLE_TEACHER"
+    Jwt jwt = (Jwt) auth.getPrincipal();               
+    String role = jwt.getClaimAsString("role");      
   
     if (!"ROLE_TEACHER".equals(role)) {
       return ResponseEntity
@@ -118,9 +120,9 @@ public class CourseController {
       @PathVariable Long id,
       Authentication auth
   ) {
-    // only admins allowed
-    Jwt jwt = (Jwt) auth.getPrincipal();                    // grab the raw JWT
-    String role = jwt.getClaimAsString("role");             // "ROLE_ADMIN"?
+
+    Jwt jwt = (Jwt) auth.getPrincipal();                  
+    String role = jwt.getClaimAsString("role");        
     if (!"ROLE_ADMIN".equals(role)) {
       return ResponseEntity
         .status(HttpStatus.FORBIDDEN)
@@ -132,6 +134,6 @@ public class CourseController {
   }
   private CourseResponse toDto(Course c) {
     return new CourseResponse(c.getId(), c.getTeacherId(),
-                              c.getTitle(), c.getDescription() , c.isApproved());
+                              c.getTitle(), c.getDescription()    , c.getPrice()   , c.isApproved());
   }
 }

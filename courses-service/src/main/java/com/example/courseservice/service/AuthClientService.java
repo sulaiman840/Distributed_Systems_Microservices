@@ -14,7 +14,7 @@ public class AuthClientService {
 
   public AuthClientService(
       RestTemplate restTemplate,
-      @Value("${auth.service.name:auth}") String authServiceName
+      @Value("${auth.service.name:auth-service}") String authServiceName
   ) {
     this.restTemplate   = restTemplate;
     this.authServiceName = authServiceName;

@@ -1,20 +1,15 @@
 package com.example.courseservice.controller;
 
-import com.example.courseservice.dto.CourseResponse;
-import com.example.courseservice.dto.UserResponse;
-import com.example.courseservice.service.AuthClientService;
-import com.example.courseservice.service.CourseService;
-import com.example.courseservice.service.SubscriptionService;
-
+import com.example.courseservice.dto.*;
+import com.example.courseservice.model.Course;
+import com.example.courseservice.service.*;
 import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -30,11 +25,26 @@ public class SubscriptionController {
   public SubscriptionController(SubscriptionService subService,
                                 CourseService courseService,
                                 AuthClientService authClient) {
-    this.subService    = subService;
+    this.subService = subService;
     this.courseService = courseService;
-    this.authClient    = authClient;
+    this.authClient = authClient;
   }
-  // 1) الطالب يشترك في دورة
+
+  // 1) Student pays (handled in PaymentService), then PaymentService calls this:
+  @PostMapping("/paid/{courseId}/{studentId}")
+  public ResponseEntity<Void> onPayment(
+      @PathVariable Long courseId,
+      @PathVariable Long studentId
+  ) {
+    Course c = courseService.get(courseId);
+    if (!c.isApproved()) {
+      return ResponseEntity.badRequest().build();
+    }
+    subService.subscribe(courseId, studentId);
+    return ResponseEntity.ok().build();
+  }
+
+  // 2) Manual subscribe attempt (will fail if not paid)
   @PostMapping("/{courseId}")
   public Mono<ResponseEntity<String>> subscribe(
       @PathVariable Long courseId,
@@ -42,9 +52,7 @@ public class SubscriptionController {
   ) {
     Jwt jwt = (Jwt) auth.getPrincipal();
     if (!"ROLE_STUDENT".equals(jwt.getClaimAsString("role"))) {
-      return Mono.just(ResponseEntity
-        .status(403)
-        .body("Only students can subscribe"));
+      return Mono.just(ResponseEntity.status(403).body("Only students can subscribe"));
     }
     Long studentId = jwt.getClaim("userId");
     return Mono.fromCallable(() -> {
@@ -56,62 +64,41 @@ public class SubscriptionController {
       );
   }
 
-  // 2) الطالب يسترجع دوراته
+  // 3) List my courses
   @GetMapping("/my")
   public Mono<ResponseEntity<List<CourseResponse>>> myCourses(Authentication auth) {
     Jwt jwt = (Jwt) auth.getPrincipal();
-    if (!"ROLE_STUDENT".equals(jwt.getClaimAsString("role"))) {
-      return Mono.just(ResponseEntity.status(403).build());
-    }
     Long studentId = jwt.getClaim("userId");
-    List<CourseResponse> dtos = subService
-      .getCoursesForStudent(studentId).stream()
-      .map(c -> new CourseResponse(
-          c.getId(),
-          c.getTeacherId(),
-          c.getTitle(),
-          c.getDescription(),
-          c.isApproved()
-        ))
+    var dtos = subService.getCoursesForStudent(studentId).stream()
+      .map(c -> new CourseResponse(c.getId(), c.getTeacherId(), c.getTitle(), c.getDescription(),    c.getPrice()   , c.isApproved()))
       .toList();
     return Mono.just(ResponseEntity.ok(dtos));
   }
 
-  // 3) المعلم يرى المشتركين في دورته
-
+  // 4) Teacher views subscribers
   @GetMapping("/course/{courseId}/subscribers")
-  @TimeLimiter(name = "subscribersTimeLimiter",
-               fallbackMethod = "subscribersTimeoutFallback")
+  @TimeLimiter(name = "subscribersTimeLimiter", fallbackMethod = "subscribersFallback")
   public CompletableFuture<List<UserResponse>> subscribers(
       @PathVariable Long courseId,
       Authentication auth
   ) {
     return CompletableFuture.supplyAsync(() -> {
       Jwt jwt = (Jwt) auth.getPrincipal();
-      // 1) تأكد دور المكلّم
-      if (!"ROLE_TEACHER".equals(jwt.getClaimAsString("role"))) {
+      if (!"ROLE_TEACHER".equals(jwt.getClaimAsString("role")))
         throw new IllegalStateException("Only teachers can view subscribers");
-      }
-      // 2) تأكد ملكيته للدورة
       var course = courseService.get(courseId);
-      if (!course.getTeacherId().equals(jwt.getClaim("userId"))) {
+      if (!course.getTeacherId().equals(jwt.getClaim("userId")))
         throw new IllegalStateException("Not your course");
-      }
-      // 3) استخرج الـ IDs واطلب بيانات كل مستخدم
-      String token = jwt.getTokenValue();
-      List<Long> studentIds = subService.getStudentIdsForCourse(courseId);
-
-      return studentIds.stream()
+      var token = jwt.getTokenValue();
+      return subService.getStudentIdsForCourse(courseId).stream()
         .map(id -> authClient.getUserById(id, token))
         .collect(Collectors.toList());
     });
   }
 
-  // fallback على الـ timeout أو أي استثناء من TimeLimiter
-  public CompletableFuture<List<UserResponse>> subscribersTimeoutFallback(
+  public CompletableFuture<List<UserResponse>> subscribersFallback(
       Long courseId, Authentication auth, Throwable t
   ) {
-    // مثلاً نرجّع لائحة فارغة
     return CompletableFuture.completedFuture(List.of());
   }
 }

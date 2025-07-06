@@ -12,19 +12,24 @@ import java.util.stream.Collectors;
 public class SubscriptionService {
   private final SubscriptionRepository subRepo;
   private final CourseService courseService;
+  private final PaymentClientService payClient;
 
   public SubscriptionService(
       SubscriptionRepository subRepo,
-      CourseService courseService
+      CourseService courseService,PaymentClientService payClient
   ) {
     this.subRepo      = subRepo;
     this.courseService = courseService;
+        this.payClient = payClient;
   }
 
   public void subscribe(Long courseId, Long studentId) {
     Course c = courseService.get(courseId);
     if (!c.isApproved()) {
       throw new IllegalStateException("Course not approved yet");
+    }
+       if (!payClient.hasPaid(courseId, studentId)) {
+      throw new IllegalStateException("Payment required before subscribing");
     }
     if (subRepo.existsByCourseIdAndStudentId(courseId, studentId)) {
       throw new IllegalStateException("Already subscribed");

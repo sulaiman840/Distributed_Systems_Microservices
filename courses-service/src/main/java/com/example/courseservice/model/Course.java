@@ -1,5 +1,7 @@
 package com.example.courseservice.model;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -23,8 +25,13 @@ public class Course {
   @Column(nullable = false)
   private boolean approved = false;
 
+    @NotNull
+  private BigDecimal price;
 
   public Course() {}
+
+  public BigDecimal getPrice() { return price; }
+  public void setPrice(BigDecimal price) { this.price = price; }
 
   public Long getId() { return id; }
 

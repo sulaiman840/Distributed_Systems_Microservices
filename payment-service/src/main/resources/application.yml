@@ -1,0 +1,30 @@
+server:
+  port: 0                                   # 0 = pick a random free port
+
+spring:
+  application:
+    name: payment-service
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/paydb?useSSL=false&serverTimezone=UTC
+    username: root
+    password: ''
+
+  jpa:
+    hibernate:
+      ddl-auto: update                      # auto-create/update tables
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    instance-id: ${spring.application.name}:${random.value}
+    prefer-ip-address: true
+    
+jwt:
+  secret: mySuperSecretKeyWhichIsVeryLongAndSecure12345
